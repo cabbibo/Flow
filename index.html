@@ -1,0 +1,305 @@
+<html>
+
+  <head>
+    <style>
+      body{ margin:0px; }
+      #container{ position:absolute; left:0px; top:0px; }
+    </style>
+  </head>
+
+  <body>
+
+    <script src="lib/three.js"></script>
+    <script src="lib/GPGPU.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    <script src="lib/CreatePositionsTexture.js"></script>
+
+    <script id="vs-pass"  type="x-shader/x-vertex">
+
+      varying vec2 vUv;
+
+	  void main() {
+	  	vUv = vec2( uv.x, 1.0 - uv.y );
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	  }
+
+    </script>
+
+    <script id="fs-pass" type="x-shader/x-fragment">
+
+      uniform sampler2D texture;
+
+      varying vec2 vUv;
+
+      void main(){
+
+        vec4 c = texture2D( texture , vUv );
+
+        gl_FragColor = c;
+
+      }
+
+
+    </script>
+    <script id="vs-render" type="x-shader/x-vertex">
+
+      uniform sampler2D map;
+      uniform float size;
+
+      varying vec3 vPosition;
+
+      void main() {
+
+          vec2 uv = position.xy + vec2( 0.5 / size, 0.5 / size );
+
+          vec4 data = texture2D( map, uv );
+
+          vPosition = data.xyz;
+
+          gl_PointSize = .01; // data.w * 10.0 + 1.0;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
+
+      }
+
+    </script>
+
+    <script id="fs-render" type="x-shader/x-fragment">
+
+
+      varying vec3 vPosition;
+      varying float opacity;
+
+      void main() {
+
+        gl_FragColor = vec4( 1.0 , vPosition.x , vPosition.y , 1.0  );
+
+      }
+
+    </script>
+
+    <script id="vs-flow" type="x-shader/x-vertex">
+
+      
+	  varying vec2 vUv;
+
+	  void main() {
+	  	vUv = vec2( uv.x, 1.0 - uv.y );
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	  }
+
+    </script>
+
+    <script id="fs-flow" type="x-shader/x-fragment">
+
+      uniform sampler2D t_oPos;
+      uniform sampler2D t_pos;
+      uniform sampler2D t_from;
+      uniform sampler2D t_to;
+
+      varying vec2 vUv;
+
+      vec4 c( sampler2D t ){
+        return texture2D( t , vUv );
+      }
+
+      void main(){
+
+        vec4 oPos   = c( t_oPos ); 
+        vec4 pos    = c( t_pos  ); 
+        vec4 from   = c( t_from ); 
+        vec4 to     = c( t_to   );
+
+        vec4 v      = pos - oPos;
+        vec4 dif    = to - pos;
+
+
+        gl_FragColor = from + dif/ 10.0; 
+
+      }
+
+
+    </script>
+
+
+    <script>
+
+
+
+      var camera, renderer, scene , controls;
+      var size;
+      
+      var vs, fs;
+
+      var geometry, material , light;
+
+      var rt_oPos, rt_pos, rt_out;
+      var flowShader;
+
+
+      init();
+      animate();
+      function init(){
+
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 2000 );
+        camera.position.z = 1000;
+
+        controls = new THREE.TrackballControls( camera );
+        scene = new THREE.Scene();
+
+
+        size = 1024;
+        from = new THREE.CubeGeometry( 200, 200, 200 );
+        to = new THREE.SphereGeometry( 200 );
+
+        fromPos = new THREE.Vector3( 200 , 0 , 0  );
+        toPos = new THREE.Vector3( -200 , 0 , 0  );
+        var fromTexture = createPositionsTexture( from , size, fromPos );
+        var toTexture = createPositionsTexture( to , size , toPos );
+
+
+        var particleGeo = new THREE.BufferGeometry();
+        console.log( particleGeo );
+
+        var attribute = new Float32Array( size * size * 3 );
+		particleGeo.addAttribute( 'position', Float32Array , size*size , 3 );
+
+        console.log( particleGeo );
+
+        var positions = particleGeo.attributes.position.array;
+
+        for ( var i = 0, j = 0, l = positions.length / 3; i < l; i ++, j += 3 ) {
+
+          positions[ j     ] = ( i % size ) / size;
+          positions[ j + 1 ] = Math.floor( i / size ) / size;
+
+        }
+
+        
+        vs = document.getElementById('vs-render').textContent;
+        fs = document.getElementById('fs-render').textContent;
+        
+        var uniforms = {
+
+          map:{ type:"t" , value:fromTexture },
+          size:{ type:"f" , value:size}
+
+        }
+        material = new THREE.ShaderMaterial({
+
+          uniforms:uniforms,
+          vertexShader: vs,
+          fragmentShader: fs,
+
+        });
+       
+        finalParticles = new THREE.ParticleSystem( particleGeo , material );
+        scene.add( finalParticles );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        rt_pos = new THREE.WebGLRenderTarget( size, size, {
+          minFilter: THREE.NearestFilter,
+          magFilter: THREE.NearestFilter,
+          format: THREE.RGBAFormat,
+          type:THREE.FloatType,
+          stencilBuffer: false
+        });
+
+	    rt_oPos = rt_pos.clone();
+	    rt_out  = rt_pos.clone();
+
+        /*
+    
+          Setting up a pass through shader 
+          for textures
+
+        */
+        var uniforms = {
+          texture:{  type:"t"  , value:null     },
+        }
+
+        vs = document.getElementById('vs-pass').textContent;
+        fs = document.getElementById('fs-pass').textContent;
+
+        texturePassShader = new THREE.ShaderMaterial({
+
+          uniforms:uniforms,
+          vertexShader:vs,
+          fragmentShader:fs
+
+        });
+
+
+        /*
+          Setting Up Flow Simulation Shader
+        */
+
+        var uniforms = {
+          t_oPos:{  type:"t"  , value:rt_oPos     },
+          t_pos:{   type:"t"  , value:rt_oPos     },
+          t_from:{  type:"t"  , value:fromTexture },
+          t_to:{    type:"t"  , value:toTexture   }
+        }
+
+        vs = document.getElementById('vs-flow').textContent;
+        fs = document.getElementById('fs-flow').textContent;
+
+        flowShader = new THREE.ShaderMaterial({
+
+          uniforms:uniforms,
+          vertexShader:vs,
+          fragmentShader:fs
+
+        });
+
+
+
+
+
+        gpgpu = new GPGPU( renderer );
+
+        document.body.appendChild( renderer.domElement );
+
+
+        texturePassShader.uniforms.texture.value = fromTexture;
+
+        gpgpu.pass( texturePassShader , rt_pos );
+        gpgpu.pass( texturePassShader , rt_oPos );
+        gpgpu.pass( texturePassShader , rt_out );
+
+
+      }
+
+      function render(){
+
+  
+        rt_oPos = rt_pos;
+        rt_pos  = rt_out;
+
+        flowShader.uniforms.t_pos.value = rt_pos;
+        flowShader.uniforms.t_oPos.value = rt_oPos;
+        gpgpu.pass( flowShader , rt_out );
+
+        //console.log( finalParticles.uniforms );
+        finalParticles.material.uniforms.map.value = rt_out;
+
+
+      }
+
+
+      function animate(){
+
+        requestAnimationFrame( animate );
+        controls.update();
+        render();
+        renderer.render( scene , camera );
+      }
+
+    </script>
+
+  </body>
+</html>
