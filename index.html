@@ -113,7 +113,7 @@
         vec4 dif    = to - pos;
 
 
-        gl_FragColor = from + dif/ 10.0; 
+        gl_FragColor = vec4( pos.xyz * 2.0 , 1.0 ) ; 
 
       }
 
@@ -277,11 +277,14 @@
       function render(){
 
   
-        rt_oPos = rt_pos;
-        rt_pos  = rt_out;
+        //rt_oPos = rt_pos;
+        //rt_pos  = rt_out;
 
-        flowShader.uniforms.t_pos.value = rt_pos;
-        flowShader.uniforms.t_oPos.value = rt_oPos;
+        //console.log( rt_pos );
+
+        /*flowShader.uniforms.t_pos.value = rt_pos;
+        flowShader.uniforms.t_oPos.value = rt_oPos;*/
+
         gpgpu.pass( flowShader , rt_out );
 
         //console.log( finalParticles.uniforms );
