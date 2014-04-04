@@ -113,7 +113,9 @@
         vec4 dif    = to - pos;
 
 
-        gl_FragColor = vec4( pos.xyz * 2.0 , 1.0 ) ; 
+        vec3 p = pos.xyz + normalize( dif.xyz ) * 50.0 ;
+        //p = to.xyz;
+        gl_FragColor = vec4( p , 1.0 ) ; 
 
       }
 
@@ -240,7 +242,7 @@
 
         var uniforms = {
           t_oPos:{  type:"t"  , value:rt_oPos     },
-          t_pos:{   type:"t"  , value:rt_oPos     },
+          t_pos:{   type:"t"  , value:rt_pos      },
           t_from:{  type:"t"  , value:fromTexture },
           t_to:{    type:"t"  , value:toTexture   }
         }
@@ -272,24 +274,74 @@
         gpgpu.pass( texturePassShader , rt_out );
 
 
+        var debugGeo = new THREE.PlaneGeometry( 100 , 100 );
+        debugMesh_oPos = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_oPos
+        }));
+        debugMesh_pos = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_pos
+        }));
+        debugMesh_out = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_out
+        }));
+
+        debugMesh_oPos.position.set( -150 , 200 , 0 );
+        debugMesh_pos.position.set(   0   , 200 , 0 );
+        debugMesh_out.position.set(   150 , 200 , 0 );
+
+        scene.add(debugMesh_oPos );
+        scene.add(debugMesh_pos );
+        scene.add(debugMesh_out );
+
+
+        counter = 0;
       }
 
       function render(){
 
+        var flipFlop = counter % 3;
+
+        if( flipFlop == 0 ){
+
+          flowShader.uniforms.t_oPos.value = rt_oPos;
+          flowShader.uniforms.t_pos.value = rt_pos;
+          gpgpu.pass( flowShader , rt_out );
+
+          finalParticles.material.uniforms.map.value = rt_out;
+
   
-        //rt_oPos = rt_pos;
-        //rt_pos  = rt_out;
+        }else if( flipFlop == 1 ){
+          
+          flowShader.uniforms.t_oPos.value = rt_pos;
+          flowShader.uniforms.t_pos.value = rt_out;
+          gpgpu.pass( flowShader , rt_oPos );
+
+          finalParticles.material.uniforms.map.value = rt_oPos;
+
+
+        }else if( flipFlop == 2 ){
+
+          flowShader.uniforms.t_oPos.value = rt_out;
+          flowShader.uniforms.t_pos.value = rt_oPos;
+          gpgpu.pass( flowShader , rt_pos );
+
+          finalParticles.material.uniforms.map.value = rt_pos;
+
+
+            
+        }
 
         //console.log( rt_pos );
 
         /*flowShader.uniforms.t_pos.value = rt_pos;
-        flowShader.uniforms.t_oPos.value = rt_oPos;*/
+        flowShader.uniforms.t_oPos.value = rt_oPos;
 
         gpgpu.pass( flowShader , rt_out );
 
         //console.log( finalParticles.uniforms );
-        finalParticles.material.uniforms.map.value = rt_out;
+        finalParticles.material.uniforms.map.value = rt_out;*/
 
+        counter ++;
 
       }
 
