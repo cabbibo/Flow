@@ -46,7 +46,7 @@
       uniform sampler2D map;
       uniform float size;
 
-      varying vec3 vPosition;
+      varying vec4 vPosition;
 
       void main() {
 
@@ -54,10 +54,10 @@
 
           vec4 data = texture2D( map, uv );
 
-          vPosition = data.xyz;
+          vPosition = data;
 
-          gl_PointSize = .3; // data.w * 10.0 + 1.0;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
+          gl_PointSize = data.w / 100.0; // data.w * 10.0 + 1.0;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition.xyz , 1.0 );
 
       }
 
@@ -66,12 +66,13 @@
     <script id="fs-render" type="x-shader/x-fragment">
 
 
-      varying vec3 vPosition;
+      varying vec4 vPosition;
       varying float opacity;
 
       void main() {
 
-        gl_FragColor = vec4( 1.0 , vPosition.x , vPosition.y , .5  );
+        vec3 c = normalize( vPosition ).xyz;
+        gl_FragColor = vec4( abs(c) , .5  );
 
       }
 
@@ -98,25 +99,25 @@
 
       varying vec2 vUv;
 
-      vec4 c( sampler2D t ){
-        return texture2D( t , vUv );
+      vec3 c( sampler2D t ){
+        return texture2D( t , vUv ).xyz;
       }
 
       void main(){
 
-        vec4 oPos   = c( t_oPos ); 
-        vec4 pos    = c( t_pos  ); 
-        vec4 from   = c( t_from ); 
-        vec4 to     = c( t_to   );
+        vec3 oPos   = c( t_oPos ); 
+        vec3 pos    = c( t_pos  ); 
+        vec3 from   = c( t_from ); 
+        vec3 to     = c( t_to   );
 
-        vec4 v      = pos - oPos;
-        vec4 dif    = to - pos;
+        vec3 v      = pos - oPos;
+        vec3 dif    = to - pos;
 
         float l_d = length( dif );
         //vec4 a = normalize( dif );
 
 
-        vec4 p = pos  + dif / 100.0;
+        vec3 p = pos  + dif / 100.0;
 
         //vec4 p = 2.0 * pos - oPos + a;
 
@@ -126,25 +127,24 @@
           p = from;
         }
 
-        /*vec3 circle = vec3( 0.0 , 0.0 , 0.0 );
+        vec3 circle = vec3( 0.0 , 0.0 , 0.0 );
 
         float r = 100.0;
 
-        vec3 d_circle = p - circle;
+        vec3 d_circle = p.xyz - circle;
         float l_circle = length( d_circle );
 
         if( l_circle < r ){
 
-
+          p = oPos - p;
           
         }
-*/
 
         //vec4 p = pos + vec4( -1.0 , 0.0 , 0.0 , 0.0 );// ( 2.0 * pos ) - oPos;
         //vec4 p = pos  + dif / 10.0;
 
         //p = to.xyz;
-        gl_FragColor = vec4( p.xyz , 1.0 ) ; 
+        gl_FragColor = vec4( p.xyz , length( v ) ) ; 
 
       }
 
