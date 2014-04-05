@@ -120,7 +120,7 @@
           add = r-l;
         }
 
-        return vec3( refl * add * 2000.0 ) ;
+        return vec3( refl * add * add ) ;
 
       }
 
@@ -212,13 +212,23 @@
         var fromTexture = createPositionsTexture( from , size , fromPos );
         var toTexture = createPositionsTexture( to , size , toPos );
 
+        var blackMat = new THREE.MeshBasicMaterial({
+          color:0x000000,
+        })
+
+
 
         var g = new THREE.IcosahedronGeometry( 80 , 4 );
-        var centerMesh = new THREE.Mesh( g , new THREE.MeshBasicMaterial({
-          color:0x000000,
-        }) );
+        var centerMesh = new THREE.Mesh( g , blackMat);
+        scene.add( centerMesh );
 
-       // scene.add( centerMesh );
+        var fromMesh = new THREE.Mesh( from , blackMat );
+        fromMesh.position = fromPos;
+        scene.add( fromMesh );
+
+        var toMesh = new THREE.Mesh( to , blackMat );
+        toMesh.position = toPos;
+        scene.add( toMesh );
        
        var particleGeo = new THREE.BufferGeometry();
         console.log( particleGeo );
