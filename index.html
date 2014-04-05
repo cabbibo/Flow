@@ -56,7 +56,7 @@
 
           vPosition = data.xyz;
 
-          gl_PointSize = .01; // data.w * 10.0 + 1.0;
+          gl_PointSize = .3; // data.w * 10.0 + 1.0;
           gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
 
       }
@@ -71,7 +71,7 @@
 
       void main() {
 
-        gl_FragColor = vec4( 1.0 , vPosition.x , vPosition.y , 1.0  );
+        gl_FragColor = vec4( 1.0 , vPosition.x , vPosition.y , .5  );
 
       }
 
@@ -83,7 +83,7 @@
 	  varying vec2 vUv;
 
 	  void main() {
-	  	vUv = vec2( uv.x, 1.0 - uv.y );
+	  	vUv = uv;
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 	  }
 
@@ -112,10 +112,39 @@
         vec4 v      = pos - oPos;
         vec4 dif    = to - pos;
 
+        float l_d = length( dif );
+        //vec4 a = normalize( dif );
 
-        vec3 p = pos.xyz + normalize( dif.xyz ) * 50.0 ;
+
+        vec4 p = pos  + dif / 100.0;
+
+        //vec4 p = 2.0 * pos - oPos + a;
+
+        // When the particles get very close 
+        // to their endpoint, return them to the beginning
+        if( length(v) < 1.0 ){
+          p = from;
+        }
+
+        /*vec3 circle = vec3( 0.0 , 0.0 , 0.0 );
+
+        float r = 100.0;
+
+        vec3 d_circle = p - circle;
+        float l_circle = length( d_circle );
+
+        if( l_circle < r ){
+
+
+          
+        }
+*/
+
+        //vec4 p = pos + vec4( -1.0 , 0.0 , 0.0 , 0.0 );// ( 2.0 * pos ) - oPos;
+        //vec4 p = pos  + dif / 10.0;
+
         //p = to.xyz;
-        gl_FragColor = vec4( p , 1.0 ) ; 
+        gl_FragColor = vec4( p.xyz , 1.0 ) ; 
 
       }
 
@@ -158,7 +187,7 @@
 
         fromPos = new THREE.Vector3( 200 , 0 , 0  );
         toPos = new THREE.Vector3( -200 , 0 , 0  );
-        var fromTexture = createPositionsTexture( from , size, fromPos );
+        var fromTexture = createPositionsTexture( from , size , fromPos );
         var toTexture = createPositionsTexture( to , size , toPos );
 
 
@@ -203,7 +232,7 @@
         renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
 
-        rt_pos = new THREE.WebGLRenderTarget( size, size, {
+        rt_1 = new THREE.WebGLRenderTarget( size, size, {
           minFilter: THREE.NearestFilter,
           magFilter: THREE.NearestFilter,
           format: THREE.RGBAFormat,
@@ -211,8 +240,8 @@
           stencilBuffer: false
         });
 
-	    rt_oPos = rt_pos.clone();
-	    rt_out  = rt_pos.clone();
+	    rt_2 = rt_1.clone();
+	    rt_3 = rt_2.clone();
 
         /*
     
@@ -268,30 +297,29 @@
 
 
         texturePassShader.uniforms.texture.value = fromTexture;
-
-        gpgpu.pass( texturePassShader , rt_pos );
-        gpgpu.pass( texturePassShader , rt_oPos );
-        gpgpu.pass( texturePassShader , rt_out );
+        gpgpu.pass( texturePassShader , rt_1 );
+        gpgpu.pass( texturePassShader , rt_2 );
+        gpgpu.pass( texturePassShader , rt_3 );
 
 
         var debugGeo = new THREE.PlaneGeometry( 100 , 100 );
-        debugMesh_oPos = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
-          map: rt_oPos
+        debugMesh_1 = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_1
         }));
-        debugMesh_pos = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
-          map: rt_pos
+        debugMesh_2 = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_2
         }));
-        debugMesh_out = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
-          map: rt_out
+        debugMesh_3 = new THREE.Mesh( debugGeo , new THREE.MeshBasicMaterial({
+          map: rt_3
         }));
 
-        debugMesh_oPos.position.set( -150 , 200 , 0 );
-        debugMesh_pos.position.set(   0   , 200 , 0 );
-        debugMesh_out.position.set(   150 , 200 , 0 );
+        debugMesh_1.position.set( -150 , 200 , 0 );
+        debugMesh_2.position.set(   0   , 200 , 0 );
+        debugMesh_3.position.set(   150 , 200 , 0 );
 
-        scene.add(debugMesh_oPos );
-        scene.add(debugMesh_pos );
-        scene.add(debugMesh_out );
+        scene.add(debugMesh_1);
+        scene.add(debugMesh_2);
+        scene.add(debugMesh_3);
 
 
         counter = 0;
@@ -303,31 +331,29 @@
 
         if( flipFlop == 0 ){
 
-          flowShader.uniforms.t_oPos.value = rt_oPos;
-          flowShader.uniforms.t_pos.value = rt_pos;
-          gpgpu.pass( flowShader , rt_out );
+          flowShader.uniforms.t_oPos.value = rt_1;
+          flowShader.uniforms.t_pos.value = rt_2;
+          gpgpu.pass( flowShader , rt_3 );
 
-          finalParticles.material.uniforms.map.value = rt_out;
+          finalParticles.material.uniforms.map.value = rt_3;
 
   
         }else if( flipFlop == 1 ){
           
-          flowShader.uniforms.t_oPos.value = rt_pos;
-          flowShader.uniforms.t_pos.value = rt_out;
-          gpgpu.pass( flowShader , rt_oPos );
+          flowShader.uniforms.t_oPos.value = rt_2;
+          flowShader.uniforms.t_pos.value = rt_3;
+          gpgpu.pass( flowShader , rt_1 );
 
-          finalParticles.material.uniforms.map.value = rt_oPos;
+          finalParticles.material.uniforms.map.value = rt_1;
 
 
         }else if( flipFlop == 2 ){
 
-          flowShader.uniforms.t_oPos.value = rt_out;
-          flowShader.uniforms.t_pos.value = rt_oPos;
-          gpgpu.pass( flowShader , rt_pos );
+          flowShader.uniforms.t_oPos.value = rt_3;
+          flowShader.uniforms.t_pos.value = rt_1;
+          gpgpu.pass( flowShader , rt_2 );
 
-          finalParticles.material.uniforms.map.value = rt_pos;
-
-
+          finalParticles.material.uniforms.map.value = rt_2;
             
         }
 
