@@ -9,6 +9,7 @@
 
   <body>
 
+    <script src="lib/jquery.min.js"></script>
     <script src="lib/three.js"></script>
     <script src="lib/GPGPU.js"></script>
     <script src="lib/TrackballControls.js"></script>
@@ -16,8 +17,9 @@
 
     <!-- For Lord Helix -->
     <script src = "lib/OBJLoader.js" ></script>
-    
-    <script id="vs-pass"  type="x-shader/x-vertex">
+
+    <script id="vs-pass" type="x-shader/x-vertex" data-src="lib/shaders/vs-pass.js"></script>
+    <!--<script id="vs-pass"  type="x-shader/x-vertex">
 
       varying vec2 vUv;
 
@@ -26,7 +28,7 @@
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 	  }
 
-    </script>
+    </script>-->
 
     <script id="fs-pass" type="x-shader/x-fragment">
 
@@ -42,8 +44,8 @@
 
       }
 
-
     </script>
+
     <script id="vs-render" type="x-shader/x-vertex">
 
       uniform sampler2D map;
@@ -152,7 +154,9 @@
 
 
         vec3 a =  normalize( dif );
-        vec3 vel = (v + a) * .8;
+        vec3 vel = (v + a ) * .8;
+
+        //vec3 vel = (v + dif / 1000.0 + a/2.0) * .8;
         //vec4 p = 2.0 * pos - oPos + a;
 
         for( int i=0; i<10; i++ ){
@@ -164,13 +168,11 @@
 
         //pos -= normalize( pos ) * sAdd.w;
 
-        vel.y +=.1 * sin( pos.x / 100.0);
-        vel.z +=.3 * sin( pos.x / 50.0);
+        vel.y +=.1 * sin( pos.z / 10.0);
+        vel.z +=.3 * sin( pos.y / 5.0);
         vel.x +=.3 * sin( pos.x / 80.0);
-       
         
         vec3 p = pos + vel;
-
 
 
         // When the particles get very close 
@@ -211,6 +213,15 @@
       animate();
       function init(){
 
+        var vertexShaders       = $('script[type="x-shader/x-vertex"]');
+        var fragmentShaders     = $('script[type="x-shader/x-fragment"]');
+
+        console.log( vertexShaders );
+        var x = loadShader( vertexShaders[0] , 'vertex' );
+
+        console.log('SSSS');
+        console.log( x );
+
         var w = window.innerWidth;
         var h = window.innerHeight;
 
@@ -230,8 +241,9 @@
 
         fromPos = new THREE.Vector3( 1000 , 0 , 0  );
         toPos = new THREE.Vector3( -1000 , 0 , 0  );
-        var fromTexture = createPositionsTexture( from , size , fromPos );
-        var toTexture = createPositionsTexture( to , size , toPos );
+        rotation = new THREE.Euler( .5 , 0 , 0 );
+        var fromTexture = createPositionsTexture( from , size , fromPos , rotation );
+        var toTexture = createPositionsTexture( to , size , toPos, rotation );
 
         var blackMat = new THREE.MeshBasicMaterial({
           color:0x000000,
@@ -281,8 +293,8 @@
           size:{ type:"f" , value:size},
           sprite:{type:"t" , value:texture },
 
-
         }
+
         material = new THREE.ShaderMaterial({
 
           uniforms:uniforms,
@@ -349,7 +361,6 @@
 
         }
 
-        console.log( circlePos );
         var uniforms = {
           t_oPos:{  type:"t"  , value:rt_oPos     },
           t_pos:{   type:"t"  , value:rt_pos      },
@@ -458,6 +469,28 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
       }
 
+      function loadShader(shader, type) {
+			
+          // wrap up the shader for convenience
+          var $shader = $(shader);
+          
+          // request the file over AJAX
+          $.ajax({
+              url: $shader.data('src'),
+              dataType: 'text',
+              context: {
+                  name: $shader.data('name'),
+                  type: type
+              },
+              complete: function(r){
+                console.log( 'HELLO' );
+                console.log(r.responseText );
+                return r.responseText;
+
+              }
+          });
+          
+      }
     </script>
 
   </body>
