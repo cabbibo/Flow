@@ -23,6 +23,11 @@
     <script src="lib/GPGPU.js"></script>
     <script src="lib/CreatePositionsTexture.js"></script>
 
+    <script src="lib/AudioController.js"></script>
+    <script src="lib/AudioTexture.js"></script>
+    <!--<script src="lib/Audio.js"></script>-->
+    <script src="lib/Stream.js"></script>
+
     <!-- For Lord Helix -->
     <script src = "lib/OBJLoader.js" ></script>
 
@@ -63,6 +68,11 @@
       var fs = {};
 
       var loader = new Loader();
+
+      var audioController = new AudioController();
+
+      var track = new Stream( 'audio/You.mp3' , audioController , false );
+      track.play();
 
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
       var fragmentShaders     = $('script[type="x-shader/x-fragment"]');
@@ -131,13 +141,14 @@
         var h = window.innerHeight;
 
         camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 10000 );
-        camera.position.z = 1000;
+        camera.position.x = -500;
 
         controls = new THREE.TrackballControls( camera );
         scene = new THREE.Scene();
 
 
         size = 512;
+
 
         from = new THREE.CubeGeometry( 200, 200, 200 , 2 , 2 , 2 );
         to = new THREE.IcosahedronGeometry( 200 , 0 );
@@ -191,7 +202,7 @@
           map:{ type:"t" , value:fromTexture },
           size:{ type:"f" , value:size},
           sprite:{type:"t" , value:texture },
-
+          audio:{type:"t" , value:audioController.texture }
         }
 
         material = new THREE.ShaderMaterial({
@@ -258,7 +269,8 @@
           t_pos:{   type:"t"  , value:rt_pos      },
           t_from:{  type:"t"  , value:fromTexture },
           t_to:{    type:"t"  , value:toTexture   },
-          circles:{ type:"v3v" , value:circlePos   }
+          t_audio:{   type:"t"  , value:audioController.texture   },
+          circles:{ type:"v3v", value:circlePos   }
         }
 
 
@@ -350,6 +362,7 @@
         requestAnimationFrame( animate );
         controls.update();
         render();
+        audioController.update();
         renderer.render( scene , camera );
       }
 
