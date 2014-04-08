@@ -5,7 +5,7 @@ uniform sampler2D t_to;
 uniform sampler2D t_audio;
 
 
-uniform vec3 circles[100];
+uniform vec3 balls[5];
 
 varying vec2 vUv;
 
@@ -379,9 +379,9 @@ void main(){
   //vec3 vel = (v + dif / 1000.0 + a/2.0) * .8;
   //vec4 p = 2.0 * pos - oPos + a;
 
-  for( int i=0; i<10; i++ ){
+  for( int i=0; i< 5; i++ ){
 
-    vec4 sAdd = sphereDisrupt( circles[i] , 200.0 , pos , vel );
+    vec4 sAdd = sphereDisrupt( balls[i] , 200.0 , pos , vel );
     vel += sAdd.xyz;
 
   }
