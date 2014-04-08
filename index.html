@@ -87,7 +87,6 @@
       loadShader( 'render', fragmentShaders[1]  , 'fragment'  );
       loadShader( 'flow',   vertexShaders[2]    , 'vertex'    );
       loadShader( 'flow',   fragmentShaders[2]  , 'fragment'  );
-  
       loadShader( 'ball',   vertexShaders[3]    , 'vertex'    );
       loadShader( 'ball',   fragmentShaders[3]  , 'fragment'  );
 
@@ -152,7 +151,8 @@
         fromRot = new THREE.Euler( 0,-Math.PI / 2,0);
         toRot = new THREE.Euler( 0,Math.PI / 2,0);
 
-        flow.fromTexture = flow.createPositionsTexture( fromGeo , fromPos , fromRot ); 
+        flow.fromTexture = flow.createPositionsTexture( fromGeo , fromPos , fromRot );
+  
         flow.toTexture = flow.createPositionsTexture( toGeo , toPos , toRot );       
         flow.flowShader.uniforms.t_from.value = flow.fromTexture;
         flow.flowShader.uniforms.t_to.value = flow.toTexture;
@@ -161,10 +161,7 @@
         flow.particles.material.uniforms.map.value = flow.fromTexture;
         flow.particles.material.uniforms.sprite.value = flow.sprite;
 
-        flow.texturePassShader.uniforms.texture.value = flow.fromTexture;
-        flow.gpgpu.pass( flow.texturePassShader , flow.rt_1 );
-        flow.gpgpu.pass( flow.texturePassShader , flow.rt_2 );
-        flow.gpgpu.pass( flow.texturePassShader , flow.rt_3 );
+        flow.reset();
 
         flow.addBalls();
         //flow.
