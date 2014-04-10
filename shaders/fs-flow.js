@@ -4,8 +4,15 @@ uniform sampler2D t_from;
 uniform sampler2D t_to;
 uniform sampler2D t_audio;
 
+// Parameters
+uniform float curlSize;
+uniform float dirPower;
+uniform float velPower;
+uniform float curlPower;
+uniform float audioPower;
+uniform float resetRadius;
 
-uniform vec3 balls[5];
+uniform vec3 balls[9];
 
 varying vec2 vUv;
 
@@ -366,7 +373,7 @@ void main(){
   float l_d = length( dif );
   float l_v = length( v );
 
-  if( l_v > 10.0 ){
+  if( l_v > resetRadius ){
     v = vec3( 0.0 , 0.0 , 0.0 );
   }
   //vec4 a = normalize( dif );
@@ -374,19 +381,19 @@ void main(){
 
 
   vec3 a =  normalize( dif );
-  vec3 vel = (v + a ) * .8;
+  vec3 vel = ( v + a * dirPower );
 
   //vec3 vel = (v + dif / 1000.0 + a/2.0) * .8;
   //vec4 p = 2.0 * pos - oPos + a;
 
-  for( int i=0; i< 5; i++ ){
+  for( int i=0; i< 9; i++ ){
 
     vec4 sAdd = sphereDisrupt( balls[i] , 200.0 , pos , vel );
     vel += sAdd.xyz;
 
   }
 
-  vec3 curl1 = curlNoise( pos * .001 );
+  vec3 curl = curlNoise( pos * curlSize );
   //pos -= normalize( pos ) * sAdd.w;
 
  /* vel.y +=.5 * sin( pos.z / 100.0);
@@ -399,7 +406,7 @@ void main(){
 
   vec3 a3 = audio.xyz * audio.xyz * audio.xyz;
   //vec3 a3 = audio.xyz;
-  vec3 p = pos + vel +  (curl1) * a3 * .7;
+  vec3 p = pos + velPower * vel +  ( curlPower * curl ) + ( audioPower * a3 );
   //vec3 p = pos + vel * ( s* .5 + .5);
 
 
@@ -407,7 +414,7 @@ void main(){
   // When the particles get very close 
   // to their endpoint, return them to the beginning
 
-  if( l_d < 10.0 ){
+  if( l_d < resetRadius ){
     p = from;
   }
   

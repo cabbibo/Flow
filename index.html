@@ -13,8 +13,8 @@
 
 
 
-    <!-- For Lord Helix -->
     <script src="lib/TrackballControls.js"></script>
+    <script src="lib/MouseMoveControls.js"></script>
 
     <script src="lib/OBJLoader.js" ></script>
     <script src="lib/ShaderLoader.js"></script>
@@ -23,11 +23,15 @@
     <script src="lib/GPGPU.js"></script>
     <script src="lib/CreatePositionsTexture.js"></script>
 
+
+    <script src="lib/TextCreator.js"></script>
     <script src="lib/AudioController.js"></script>
     <script src="lib/AudioTexture.js"></script>
     <script src="lib/Stream.js"></script>
 
+    <script src="lib/initRaycaster.js"></script>
     <script src="lib/Flow.js"></script>
+    <script src="lib/Song.js"></script>
 
 
     <script id="vs-pass" type="x-shader/x-vertex" data-src="shaders/vs-pass.js">
@@ -46,6 +50,11 @@
     <script id="vs-ball" type="x-shader/x-vertex" data-src="shaders/vs-ball.js">
     </script>
     <script id="fs-ball" type="x-shader/x-fragment" data-src="shaders/fs-ball.js">
+    </script>
+
+    <script id="vs-active" type="x-shader/x-vertex" data-src="shaders/vs-active.js">
+    </script>
+    <script id="fs-active" type="x-shader/x-fragment" data-src="shaders/fs-active.js">
     </script>
 
 
@@ -71,10 +80,9 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
+      audioController.mute.gain.value = .5;
 
-      var track = new Stream( 'audio/You.mp3' , audioController , false );
-      track.play();
-
+     
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
       var fragmentShaders     = $('script[type="x-shader/x-fragment"]');
 
@@ -89,6 +97,8 @@
       loadShader( 'flow',   fragmentShaders[2]  , 'fragment'  );
       loadShader( 'ball',   vertexShaders[3]    , 'vertex'    );
       loadShader( 'ball',   fragmentShaders[3]  , 'fragment'  );
+      loadShader( 'active',   vertexShaders[4]    , 'vertex'    );
+      loadShader( 'active',   fragmentShaders[4]  , 'fragment'  );
 
       loader.addToLoadBar();
 
@@ -101,9 +111,9 @@
           if ( child instanceof THREE.Mesh ) {
             var geo = new THREE.Geometry();
             var mesh = new THREE.Mesh( child.geometry , mainMaterial );
-            mesh.scale.multiplyScalar( 1000 );
+            mesh.scale.multiplyScalar( 500 );
             THREE.GeometryUtils.merge( geo , mesh );
-            toGeo = geo;       
+            headGeo = geo;       
           }
         } );
         loader.loadBarAdd();
@@ -114,9 +124,9 @@
             if ( child instanceof THREE.Mesh ) {
               var geo = new THREE.Geometry();
               var mesh = new THREE.Mesh( child.geometry , mainMaterial );
-              mesh.scale.multiplyScalar( 10 );
+              mesh.scale.multiplyScalar( 3 );
               THREE.GeometryUtils.merge( geo , mesh );
-              fromGeo = geo;       
+              logoGeo = geo;       
             }
         });
         loader.loadBarAdd();
@@ -131,9 +141,11 @@
         var h = window.innerHeight;
 
         camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 10000 );
-        camera.position.x = -500;
+        camera.position.z = 4000;
 
-        controls = new THREE.TrackballControls( camera );
+        controls = new THREE.MouseMoveControls( camera );
+        controls.z = 2000;
+        //controls = new THREE.TrackballControls( camera );
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer();
@@ -142,10 +154,11 @@
 
         size = 512;
 
+        initRaycaster();
 
         flow = new Flow( size );
 
-        fromPos = new THREE.Vector3( 1000 , 0 , 0  );
+        /*fromPos = new THREE.Vector3( 1000 , 0 , 0  );
         toPos = new THREE.Vector3( -1000 , 0 , 0  );
         
         fromRot = new THREE.Euler( 0,-Math.PI / 2,0);
@@ -155,17 +168,104 @@
   
         flow.toTexture = flow.createPositionsTexture( toGeo , toPos , toRot );       
         flow.flowShader.uniforms.t_from.value = flow.fromTexture;
-        flow.flowShader.uniforms.t_to.value = flow.toTexture;
+        //flow.flowShader.uniforms.t_to.value = flow.toTexture;*/
+
+
+        /*
+
+          Setting Up Songs
+
+        */
+
+        var geo = new THREE.IcosahedronGeometry( 100 , 3 );
+        var geo = logoGeo;
+        var geo = headGeo;
+        geo.computeFaceNormals();
+        geo.computeVertexNormals();
+        //geo.computeF
+
+        var to = new THREE.Mesh( geo , mainMaterial );
+        to.position.set( -1000 , -500 , 0 );
+        var from = new THREE.Mesh( geo , mainMaterial );
+        from.position.set( 1000 , -500 , 0 );
+
+        var title = 'Lucifer'
+        var file  = 'audio/lucifer.mp3'
+        new Song( flow , title , file , from , to  ,{
+          curlSize:{type:"f"  , value:.01},
+          dirPower:{type:"f"  , value:10.0},
+          velPower:{type:"f"  , value:.3},
+          curlPower:{type:"f"  , value:1.2},
+          audioPower:{type:"f"  , value:.5},
+          resetRadius:{type:"f"  , value:1.0}, 
+        });
+
+        var to = new THREE.Mesh( geo , mainMaterial );
+        to.position.set( -1000 , 500 , 0 );
+        var from = new THREE.Mesh( geo , mainMaterial );
+        from.position.set( 1000 , 500 , 0 );
+
+        var title = 'Maze1'
+        var file  = 'audio/maze1.mp3'
+        new Song( flow , title , file , from , to  , {
+          curlSize:{type:"f"  , value:.001},
+          dirPower:{type:"f"  , value:1.0},
+          velPower:{type:"f"  , value:.9},
+          curlPower:{type:"f"  , value:.4},
+          audioPower:{type:"f"  , value:.5},
+          resetRadius:{type:"f"  , value:50.0}, 
+        } );
+
+        var to = new THREE.Mesh( geo , mainMaterial );
+        to.position.set( -1000 , 200 , 0 );
+        var from = new THREE.Mesh( geo , mainMaterial );
+        from.position.set( 1000 , 200 , 0 );
+
+        var title = 'Trails'
+        var file  = 'audio/trails.mp3'
+        new Song( flow , title , file , from , to  , {
+          curlSize:{type:"f"  , value:.004},
+          dirPower:{type:"f"  , value:2.0},
+          velPower:{type:"f"  , value:.9},
+          curlPower:{type:"f"  , value:1.2},
+          audioPower:{type:"f"  , value:.5},
+          resetRadius:{type:"f"  , value:10.0},
+        } );
+
+         var to = new THREE.Mesh( geo , mainMaterial );
+        to.position.set( -1000 , -200 , 0 );
+        var from = new THREE.Mesh( geo , mainMaterial );
+        from.position.set( 1000 , -200 , 0 );
+
+        var title = 'Tree Torrent'
+        var file  = 'audio/treeTorrent.mp3'
+        new Song( flow , title , file , from , to  ,{
+          curlSize:{type:"f"  , value:.001},
+          dirPower:{type:"f"  , value:3.0},
+          velPower:{type:"f"  , value:.7},
+          curlPower:{type:"f"  , value:2.2},
+          audioPower:{type:"f"  , value:1.5},
+          resetRadius:{type:"f"  , value:10.0},
+        });
+
+
+
+        flow.flowShader.uniforms.t_from.value = SONGS[0].fromTexture;
+        flow.flowShader.uniforms.t_to.value = SONGS[0].toTexture;
+
+        flow.particles.material.uniforms.map.value = SONGS[0].fromTexture;
 
         flow.sprite = THREE.ImageUtils.loadTexture( "lib/lensFlare.png" );
-        flow.particles.material.uniforms.map.value = flow.fromTexture;
         flow.particles.material.uniforms.sprite.value = flow.sprite;
-
-        flow.reset();
+        //flow.fromTexure = .uniforms.map.value = flow.fromTexture;
+        flow.fromTexure = SONGS[0].fromTexture;
+        flow.toTexure = SONGS[0].toTexture;
+        flow.reset( SONGS[0].fromTexture );
 
         flow.addBalls();
         //flow.
         scene.add( flow.particles );
+
 
         document.body.appendChild( renderer.domElement );
         window.addEventListener( 'resize', onResize , false );
