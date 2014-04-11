@@ -4,6 +4,10 @@ uniform sampler2D t_from;
 uniform sampler2D t_to;
 uniform sampler2D t_audio;
 
+uniform float time;
+uniform float timeSpeed;
+uniform float timePower;
+
 // Parameters
 uniform float curlSize;
 uniform float dirPower;
