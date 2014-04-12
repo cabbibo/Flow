@@ -6,6 +6,7 @@ uniform float noisePower;
 uniform float time;
 uniform float timeSpeed;
 uniform float timePower;
+uniform float audioSizePower;
 
 
 varying vec2 vUv;
@@ -205,9 +206,11 @@ void main() {
 
     float d = length(mvPos.xyz);
     float a4 = vAudio.x * vAudio.x * vAudio.x * vAudio.x;
-    gl_PointSize = particleSize * a4 / d; // data.w * 10.0 + 1.0;
+    float aSize = a4 * audioSizePower; 
+    float nSize = vNoise * noisePower;
+    gl_PointSize = particleSize *  ( aSize + nSize ) / d; // data.w * 10.0 + 1.0;
 
-    gl_PointSize = vNoise * particleSize / d;
+    //gl_PointSize = vNoise * particleSize / d;
     gl_Position = projectionMatrix * mvPos;
 }
 
