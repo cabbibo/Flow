@@ -341,6 +341,7 @@ vec3 curlNoise( vec3 p ){
   const float divisor = 1.0 / ( 2.0 * e );
   return normalize( vec3( x , y , z ) * divisor );
 }
+
 vec3 c( sampler2D t ){
   return texture2D( t , vUv ).xyz;
 }

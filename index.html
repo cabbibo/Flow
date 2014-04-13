@@ -9,8 +9,8 @@
 
     <script src="lib/three.js"></script>
     <script src="lib/jquery.min.js"></script>
+    <script src="lib/stats.min.js"></script>
     <script src="lib/underscore.js"></script>
-
 
 
     <script src="lib/TrackballControls.js"></script>
@@ -32,6 +32,7 @@
     <script src="lib/initRaycaster.js"></script>
     <script src="lib/Flow.js"></script>
     <script src="lib/Song.js"></script>
+    <script src="lib/Ball.js"></script>
 
 
     <script id="vs-pass" type="x-shader/x-vertex" data-src="shaders/vs-pass.js">
@@ -47,9 +48,34 @@
     <script id="fs-flow" type="x-shader/x-fragment" data-src="shaders/fs-flow.js">
     </script>
 
-    <script id="vs-ball" type="x-shader/x-vertex" data-src="shaders/vs-ball.js">
+    <script id="vs-ball_neutral" type="x-shader/x-vertex" data-src="shaders/vs-ball_neutral.js">
     </script>
-    <script id="fs-ball" type="x-shader/x-fragment" data-src="shaders/fs-ball.js">
+    <script id="fs-ball_neutral" type="x-shader/x-fragment" data-src="shaders/fs-ball_neutral.js">
+    </script>
+
+    <script id="vs-ball_hover" type="x-shader/x-vertex" data-src="shaders/vs-ball_hover.js">
+    </script>
+    <script id="fs-ball_hover" type="x-shader/x-fragment" data-src="shaders/fs-ball_hover.js">
+    </script>
+
+    
+    <script id="vs-ball_active" type="x-shader/x-vertex" data-src="shaders/vs-ball_active.js">
+    </script>
+    <script id="fs-ball_active" type="x-shader/x-fragment" data-src="shaders/fs-ball_active.js">
+    </script>
+
+
+   
+
+
+    <script id="vs-neutral" type="x-shader/x-vertex" data-src="shaders/vs-neutral.js">
+    </script>
+    <script id="fs-neutral" type="x-shader/x-fragment" data-src="shaders/fs-neutral.js">
+    </script>
+
+    <script id="vs-hover" type="x-shader/x-vertex" data-src="shaders/vs-hover.js">
+    </script>
+    <script id="fs-hover" type="x-shader/x-fragment" data-src="shaders/fs-hover.js">
     </script>
 
     <script id="vs-active" type="x-shader/x-vertex" data-src="shaders/vs-active.js">
@@ -58,11 +84,15 @@
     </script>
 
 
+
     <script>
 
-      var camera, renderer, scene , controls;
+      var camera, renderer, scene , controls ,stats;
       var size;
-      
+
+
+      var movementPlane;
+
       var vs, fs;
 
       var geometry, material , light;
@@ -80,7 +110,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      audioController.mute.gain.value = .5;
+      //audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -95,10 +125,18 @@
       loadShader( 'render', fragmentShaders[1]  , 'fragment'  );
       loadShader( 'flow',   vertexShaders[2]    , 'vertex'    );
       loadShader( 'flow',   fragmentShaders[2]  , 'fragment'  );
-      loadShader( 'ball',   vertexShaders[3]    , 'vertex'    );
-      loadShader( 'ball',   fragmentShaders[3]  , 'fragment'  );
-      loadShader( 'active',   vertexShaders[4]    , 'vertex'    );
-      loadShader( 'active',   fragmentShaders[4]  , 'fragment'  );
+      loadShader( 'ball_neutral',   vertexShaders[3]    , 'vertex'    );
+      loadShader( 'ball_neutral',   fragmentShaders[3]  , 'fragment'  );
+      loadShader( 'ball_hover',   vertexShaders[4]    , 'vertex'    );
+      loadShader( 'ball_hover',   fragmentShaders[4]  , 'fragment'  );
+      loadShader( 'ball_active',   vertexShaders[5]    , 'vertex'    );
+      loadShader( 'ball_active',   fragmentShaders[5]  , 'fragment'  );
+      loadShader( 'neutral',   vertexShaders[6]    , 'vertex'    );
+      loadShader( 'neutral',   fragmentShaders[6]  , 'fragment'  );
+      loadShader( 'hover',   vertexShaders[7]    , 'vertex'    );
+      loadShader( 'hover',   fragmentShaders[7]  , 'fragment'  );
+      loadShader( 'active',   vertexShaders[8]    , 'vertex'    );
+      loadShader( 'active',   fragmentShaders[8]  , 'fragment'  );
 
       loader.addToLoadBar();
 
@@ -153,12 +191,27 @@
         renderer = new THREE.WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
 
+        stats = new Stats();
+        stats.domElement.id = "stats";
+        document.body.appendChild( stats.domElement );
 
         size = 512;
 
-        initRaycaster();
+        movementPlane = new THREE.Mesh( 
+        new THREE.PlaneGeometry( 20000, 20000, 8, 8 ), 
+        new THREE.MeshBasicMaterial({ 
+          color: 0xffffff, 
+         // opacity: 0.25,
+         // transparent: true, 
+          wireframe: true 
+        } ) );
+        movementPlane.visible = false;
+        scene.add( movementPlane );
 
         flow = new Flow( size );
+
+        initRaycaster();
+        
 
         /*fromPos = new THREE.Vector3( 1000 , 0 , 0  );
         toPos = new THREE.Vector3( -1000 , 0 , 0  );
@@ -352,6 +405,8 @@
       
       function animate(){
 
+
+        stats.update();
         requestAnimationFrame( animate );
         controls.update();
         flow.update();

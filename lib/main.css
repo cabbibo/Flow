@@ -1,5 +1,5 @@
 html{
-  color:#fff;
+  color:#000;
   font-family:"GeoSans";
   background-repeat:no-repeat;
   cursor: url(cursorWhite.png), auto;
@@ -8,6 +8,7 @@ html{
 }
 
 body{
+  color:#000;
   margin: 0px;
   overflow: hidden;
 }
@@ -224,6 +225,7 @@ a:hover{
   position:absolute;
   right:0px;
   bottom:0px;
+  z-index:999;
 
 }
 
