@@ -393,7 +393,7 @@ void main(){
 
   for( int i=0; i< 9; i++ ){
 
-    vec4 sAdd = sphereDisrupt( balls[i] , 200.0 , pos , vel );
+    vec4 sAdd = sphereDisrupt( balls[i] , 400.0 , pos , vel );
     vel += sAdd.xyz;
 
   }

@@ -8,7 +8,8 @@ const float pi = 3.14159;
 void main() {
 
 
-  gl_FragColor = vec4( vAudio );
+
+  gl_FragColor = vec4(vAudio.xyz + vColor , 1.0 );
 
 }
 

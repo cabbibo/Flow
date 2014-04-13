@@ -30,9 +30,11 @@
     <script src="lib/Stream.js"></script>
 
     <script src="lib/initRaycaster.js"></script>
+    <script src="lib/initSongs.js"></script>
     <script src="lib/Flow.js"></script>
     <script src="lib/Song.js"></script>
     <script src="lib/Ball.js"></script>
+    <script src="lib/Math.js"></script>
 
 
     <script id="vs-pass" type="x-shader/x-vertex" data-src="shaders/vs-pass.js">
@@ -110,7 +112,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      //audioController.mute.gain.value = .0;
+      audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -141,7 +143,8 @@
       loader.addToLoadBar();
 
       var mainMaterial =  new THREE.MeshBasicMaterial({
-        color:0x000000
+        color:0x000000,
+        side:THREE.DoubleSide
       });
 
       loader.OBJLoader.load( 'lib/LeePerrySmith.obj' , function( object ){
@@ -149,8 +152,10 @@
           if ( child instanceof THREE.Mesh ) {
             var geo = new THREE.Geometry();
             var mesh = new THREE.Mesh( child.geometry , mainMaterial );
-            mesh.scale.multiplyScalar( 500 );
+            mesh.scale.multiplyScalar( 2000 );
             THREE.GeometryUtils.merge( geo , mesh );
+            geo.computeVertexNormals();
+
             headGeo = geo;       
           }
         } );
@@ -162,8 +167,9 @@
             if ( child instanceof THREE.Mesh ) {
               var geo = new THREE.Geometry();
               var mesh = new THREE.Mesh( child.geometry , mainMaterial );
-              mesh.scale.multiplyScalar( 3 );
+              mesh.scale.multiplyScalar( 20 );
               THREE.GeometryUtils.merge( geo , mesh );
+              geo.computeVertexNormals();
               logoGeo = geo;       
             }
         });
@@ -178,14 +184,15 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 10000 );
+        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 15000 );
         camera.position.z = 4000;
 
-        controls = new THREE.MouseMoveControls( camera );
-        ///controls = new THREE.TrackballControls( camera );
-
-        controls.z = 2000;
+       
         controls = new THREE.TrackballControls( camera );
+        controls.rotateSpeed = 1;
+        controls.minDistance = 1000;
+        controls.maxDistance = 10000;
+        controls.dynamicDampingFactor = .1;
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer();
@@ -213,168 +220,7 @@
         initRaycaster();
 
 
-        /*fromPos = new THREE.Vector3( 1000 , 0 , 0  );
-        toPos = new THREE.Vector3( -1000 , 0 , 0  );
-        
-        fromRot = new THREE.Euler( 0,-Math.PI / 2,0);
-        toRot = new THREE.Euler( 0,Math.PI / 2,0);
-
-        flow.fromTexture = flow.createPositionsTexture( fromGeo , fromPos , fromRot );
-  
-        flow.toTexture = flow.createPositionsTexture( toGeo , toPos , toRot );       
-        flow.flowShader.uniforms.t_from.value = flow.fromTexture;
-        //flow.flowShader.uniforms.t_to.value = flow.toTexture;*/
-
-
-        /*
-
-          Setting Up Songs
-
-        */
-
-        var geo = new THREE.IcosahedronGeometry( 100 , 3 );
-        var geo = logoGeo;
-        var geo = headGeo;
-        geo.computeFaceNormals();
-        geo.computeVertexNormals();
-        //geo.computeF
-
-        var to = new THREE.Mesh( geo , mainMaterial );
-        to.position.set( -1000 , -500 , 0 );
-        var from = new THREE.Mesh( geo , mainMaterial );
-        from.position.set( 1000 , -500 , 0 );
-
-        var title = 'Lucifer'
-        var file  = 'audio/lucifer.mp3'
-        new Song( flow , title , file , from , to  ,
-        {
-          curlSize:{type:"f"  , value:.01},
-          dirPower:{type:"f"  , value:10.0},
-          velPower:{type:"f"  , value:.3},
-          curlPower:{type:"f"  , value:1.2},
-          audioPower:{type:"f"  , value:.5},
-          resetRadius:{type:"f"  , value:1.0}, 
-        },
-
-        {
-
-          particleSize:{ type:"f" , value:900 },
-          noiseSize:{ type:"f" , value:.001 },
-          noisePower:{ type:"f" , value:5.5 },
-          audioSizePower:{ type:"f" , value:4.1 },
-          positionPower:{ type:"f" , value:5.4 },
-          spritePower:{ type:"f" , value:.1 },
-          audioPower:{ type:"v3" , value:new THREE.Vector3( 4.5 , 4 , 0 ) },
-          colorPower:{ type:"f" , value:.6 },
-          weirdPower:{ type:"f" , value:1 },
-          finalDivision:{ type:"f" , value:2 },
-          color:{ type:"v3" , value: new THREE.Vector3( 2.5 , .9 , 4. ) },
-
-        });
-
-      
-
-        var to = new THREE.Mesh( geo , mainMaterial );
-        to.position.set( -1000 , 500 , 0 );
-        var from = new THREE.Mesh( geo , mainMaterial );
-        from.position.set( 1000 , 500 , 0 );
-
-        var title = 'Maze1'
-        var file  = 'audio/maze1.mp3'
-        new Song( flow , title , file , from , to  , {
-          curlSize:{type:"f"  , value:.001},
-          dirPower:{type:"f"  , value:1.0},
-          velPower:{type:"f"  , value:.9},
-          curlPower:{type:"f"  , value:.4},
-          audioPower:{type:"f"  , value:.5},
-          resetRadius:{type:"f"  , value:50.0}, 
-        } ,
-        
-       {
-
-          particleSize:{ type:"f" , value:10000 },
-          noiseSize:{ type:"f" , value:.01 },
-          noisePower:{ type:"f" , value:.1 },
-          audioSizePower:{ type:"f" , value:1.3 },
-          positionPower:{ type:"f" , value:.4 },
-          spritePower:{ type:"f" , value:.1 },
-          audioPower:{ type:"v3" , value:new THREE.Vector3( 1.5 , 4 , 10 ) },
-          colorPower:{ type:"f" , value:1.6 },
-          weirdPower:{ type:"f" , value:100 },
-          finalDivision:{ type:"f" , value:1 },
-          color:{ type:"v3" , value: new THREE.Vector3( 4.5 , .9 , 2. ) },
-
-        } 
-        );
-
-        var to = new THREE.Mesh( geo , mainMaterial );
-        to.position.set( -1000 , 200 , 0 );
-        var from = new THREE.Mesh( geo , mainMaterial );
-        from.position.set( 1000 , 200 , 0 );
-
-        var title = 'Trails'
-        var file  = 'audio/trails.mp3'
-        new Song( flow , title , file , from , to  , {
-          curlSize:{type:"f"  , value:.004},
-          dirPower:{type:"f"  , value:2.0},
-          velPower:{type:"f"  , value:.9},
-          curlPower:{type:"f"  , value:1.2},
-          audioPower:{type:"f"  , value:.5},
-          resetRadius:{type:"f"  , value:10.0},
-        },
-
-        {
-
-          particleSize:{ type:"f" , value:30000 },
-          noiseSize:{ type:"f" , value:.01 },
-          noisePower:{ type:"f" , value:.1 },
-          audioSizePower:{ type:"f" , value:.2 },
-          positionPower:{ type:"f" , value:10. },
-          spritePower:{ type:"f" , value:.1 },
-          audioPower:{ type:"v3" , value:new THREE.Vector3( .4 , 4 , 4 ) },
-          colorPower:{ type:"f" , value:1.6 },
-          weirdPower:{ type:"f" , value:10 },
-          finalDivision:{ type:"f" , value:1 },
-          color:{ type:"v3" , value: new THREE.Vector3( 1.5 , 2.9 , 2. ) },
-
-        } 
-        
-        );
-
-         var to = new THREE.Mesh( geo , mainMaterial );
-        to.position.set( -1000 , -200 , 0 );
-        var from = new THREE.Mesh( geo , mainMaterial );
-        from.position.set( 1000 , -200 , 0 );
-
-        var title = 'Tree Torrent'
-        var file  = 'audio/treeTorrent.mp3'
-        new Song( flow , title , file , from , to  ,{
-          curlSize:{type:"f"  , value:.001},
-          dirPower:{type:"f"  , value:4.0},
-          velPower:{type:"f"  , value:.7},
-          curlPower:{type:"f"  , value:2.2},
-          audioPower:{type:"f"  , value:1.5},
-          resetRadius:{type:"f"  , value:10.0},
-        },
-        {
-
-          particleSize:{ type:"f" , value:10000 },
-          noiseSize:{ type:"f" , value:.018 },
-          noisePower:{ type:"f" , value:.00 },
-          audioSizePower:{ type:"f" , value:.8 },
-          positionPower:{ type:"f" , value:3. },
-          spritePower:{ type:"f" , value:.1 },
-          audioPower:{ type:"v3" , value:new THREE.Vector3( 1.5 , 10 , 1 ) },
-          colorPower:{ type:"f" , value:1.6 },
-          weirdPower:{ type:"f" , value:0 },
-          finalDivision:{ type:"f" , value:1 },
-
-          color:{ type:"v3" , value: new THREE.Vector3( 4.5 , .9 , 2. ) },
-
-        } 
-        
-        );
-
+        initSongs(); 
 
 
         flow.flowShader.uniforms.t_from.value = SONGS[0].fromTexture;
@@ -398,6 +244,7 @@
         window.addEventListener( 'resize', onResize , false );
         
 
+        loader.liftCurtain();
         animate();
 
       }
@@ -439,7 +286,6 @@
                   type: type
               },
               complete: function(r){
-                console.log( 'hellos' );
                 loader.loadBarAdd();
                 if( type == 'vertex' ){
                   vs[title] = r.responseText;
@@ -450,6 +296,33 @@
               }
           });
           
+        }
+    
+      function addSocial( smArray ){
+
+        this.social = document.createElement('div');
+        this.social.id = 'social';
+        document.body.appendChild( this.social );
+
+        for( var i  = 0; i < smArray.length; i ++ ){
+
+          var a = document.createElement('a');
+          a.href = smArray.social[i][1];
+          a.target = '_blank';
+
+          a.style.background = 'url( icons/'+smArray.social[i][0]+')';
+          a.style.backgroundSize = '100%';
+         /* a.style.width = '25px';
+          a.style.height = '25px';
+          a.style.display = 'block';
+          a.style.margin = '5px';
+          a.style.opacity = '.3';*/
+          a.className += 'social';
+
+          this.social.appendChild( a );
+
+        }
+
       }
     </script>
 

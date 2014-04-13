@@ -6,7 +6,9 @@ varying vec3 vColor;
 void main() {
 
   vec3 nPos = abs(normalize( position ));
-  vColor = nPos;
+  vColor = normal;
+
+
 
   vec4 x = texture2D( t_audio , vec2( vColor.x , 0.0) );
   vec4 y = texture2D( t_audio , vec2( vColor.y , 0.0) );
