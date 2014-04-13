@@ -209,7 +209,7 @@ void main() {
     float a4 = vAudio.x * vAudio.x * vAudio.x * vAudio.x;
     float aSize = a4 * audioSizePower; 
     float nSize = vNoise * noisePower;
-    gl_PointSize = dpr * particleSize *  ( aSize + nSize ) / d; // data.w * 10.0 + 1.0;
+    gl_PointSize = dpr * particleSize *  ( aSize + nSize ) / (d*.5 ); // data.w * 10.0 + 1.0;
 
     //gl_PointSize = vNoise * particleSize / d;
     gl_Position = projectionMatrix * mvPos;

@@ -112,7 +112,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      audioController.mute.gain.value = .0;
+      //audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -141,6 +141,19 @@
       loadShader( 'active',   fragmentShaders[8]  , 'fragment'  );
 
       loader.addToLoadBar();
+
+      var sm = [
+
+        ["twitter_1.png" , "http://twitter.com/share?text=Check%20out%20interactive%20EP%20'System%20Preferences'%20by%20@rioux__;%20visualized%20by%20@cabbibo%20&url=http://cabbibo.com/rioux"],
+        ["facebook_1.png" , 'http://www.facebook.com/sharer.php?u=http://cabbibo.com/rioux'],
+        ["soundcloud_1.png" , "https://soundcloud.com/rioux"],
+        ["cabbibo_1.png" , "http://wom.bs"],
+        ["download_1.png" , "System_Preferences.zip"],
+
+
+      ]
+      
+      addSocial( sm );
 
       var mainMaterial =  new THREE.MeshBasicMaterial({
         color:0x000000,
@@ -307,16 +320,11 @@
         for( var i  = 0; i < smArray.length; i ++ ){
 
           var a = document.createElement('a');
-          a.href = smArray.social[i][1];
+          a.href = smArray[i][1];
           a.target = '_blank';
 
-          a.style.background = 'url( icons/'+smArray.social[i][0]+')';
+          a.style.background = 'url( icons/'+smArray[i][0]+')';
           a.style.backgroundSize = '100%';
-         /* a.style.width = '25px';
-          a.style.height = '25px';
-          a.style.display = 'block';
-          a.style.margin = '5px';
-          a.style.opacity = '.3';*/
           a.className += 'social';
 
           this.social.appendChild( a );
