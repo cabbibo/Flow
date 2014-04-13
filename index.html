@@ -211,7 +211,7 @@
         flow = new Flow( size );
 
         initRaycaster();
-        
+
 
         /*fromPos = new THREE.Vector3( 1000 , 0 , 0  );
         toPos = new THREE.Vector3( -1000 , 0 , 0  );
@@ -406,12 +406,13 @@
       function animate(){
 
 
-        stats.update();
         requestAnimationFrame( animate );
-        controls.update();
-        flow.update();
+        stats.update();
+         flow.update();
         audioController.update();
-        renderer.render( scene , camera );
+        
+        controls.update();
+         renderer.render( scene , camera );
       }
 
       function onResize() {
