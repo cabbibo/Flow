@@ -1,12 +1,16 @@
 uniform sampler2D t_audio;
+uniform sampler2D t_text;
 uniform vec3 color;
 
+varying vec2 vUv;
 varying vec4 vAudio;
 varying vec3 vColor;
 void main() {
 
   vec3 nPos = abs(normalize( position ));
   vColor = nPos;
+
+  vUv = uv;
 
   vec4 x = texture2D( t_audio , vec2( vColor.x , 0.0) );
   vec4 y = texture2D( t_audio , vec2( vColor.y , 0.0) );

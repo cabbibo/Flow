@@ -50,39 +50,19 @@
     <script id="fs-flow" type="x-shader/x-fragment" data-src="shaders/fs-flow.js">
     </script>
 
-    <script id="vs-ball_neutral" type="x-shader/x-vertex" data-src="shaders/vs-ball_neutral.js">
+    <script id="vs-ball" type="x-shader/x-vertex" data-src="shaders/vs-ball.js">
     </script>
-    <script id="fs-ball_neutral" type="x-shader/x-fragment" data-src="shaders/fs-ball_neutral.js">
-    </script>
-
-    <script id="vs-ball_hover" type="x-shader/x-vertex" data-src="shaders/vs-ball_hover.js">
-    </script>
-    <script id="fs-ball_hover" type="x-shader/x-fragment" data-src="shaders/fs-ball_hover.js">
+    <script id="fs-ball" type="x-shader/x-fragment" data-src="shaders/fs-ball.js">
     </script>
 
-    
-    <script id="vs-ball_active" type="x-shader/x-vertex" data-src="shaders/vs-ball_active.js">
+    <script id="vs-model" type="x-shader/x-vertex" data-src="shaders/vs-model.js">
     </script>
-    <script id="fs-ball_active" type="x-shader/x-fragment" data-src="shaders/fs-ball_active.js">
-    </script>
-
-
-   
-
-
-    <script id="vs-neutral" type="x-shader/x-vertex" data-src="shaders/vs-neutral.js">
-    </script>
-    <script id="fs-neutral" type="x-shader/x-fragment" data-src="shaders/fs-neutral.js">
+    <script id="fs-model" type="x-shader/x-fragment" data-src="shaders/fs-model.js">
     </script>
 
-    <script id="vs-hover" type="x-shader/x-vertex" data-src="shaders/vs-hover.js">
+    <script id="vs-text" type="x-shader/x-vertex" data-src="shaders/vs-text.js">
     </script>
-    <script id="fs-hover" type="x-shader/x-fragment" data-src="shaders/fs-hover.js">
-    </script>
-
-    <script id="vs-active" type="x-shader/x-vertex" data-src="shaders/vs-active.js">
-    </script>
-    <script id="fs-active" type="x-shader/x-fragment" data-src="shaders/fs-active.js">
+    <script id="fs-text" type="x-shader/x-fragment" data-src="shaders/fs-text.js">
     </script>
 
 
@@ -112,7 +92,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      //audioController.mute.gain.value = .0;
+      audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -127,28 +107,25 @@
       loadShader( 'render', fragmentShaders[1]  , 'fragment'  );
       loadShader( 'flow',   vertexShaders[2]    , 'vertex'    );
       loadShader( 'flow',   fragmentShaders[2]  , 'fragment'  );
-      loadShader( 'ball_neutral',   vertexShaders[3]    , 'vertex'    );
-      loadShader( 'ball_neutral',   fragmentShaders[3]  , 'fragment'  );
-      loadShader( 'ball_hover',   vertexShaders[4]    , 'vertex'    );
-      loadShader( 'ball_hover',   fragmentShaders[4]  , 'fragment'  );
-      loadShader( 'ball_active',   vertexShaders[5]    , 'vertex'    );
-      loadShader( 'ball_active',   fragmentShaders[5]  , 'fragment'  );
-      loadShader( 'neutral',   vertexShaders[6]    , 'vertex'    );
-      loadShader( 'neutral',   fragmentShaders[6]  , 'fragment'  );
-      loadShader( 'hover',   vertexShaders[7]    , 'vertex'    );
-      loadShader( 'hover',   fragmentShaders[7]  , 'fragment'  );
-      loadShader( 'active',   vertexShaders[8]    , 'vertex'    );
-      loadShader( 'active',   fragmentShaders[8]  , 'fragment'  );
+      loadShader( 'ball',   vertexShaders[3]    , 'vertex'    );
+      loadShader( 'ball',   fragmentShaders[3]  , 'fragment'  );
+      loadShader( 'model',   vertexShaders[4]    , 'vertex'    );
+      loadShader( 'model',   fragmentShaders[4]  , 'fragment'  );
+      loadShader( 'text',   vertexShaders[5]    , 'vertex'    );
+      loadShader( 'text',   fragmentShaders[5]  , 'fragment'  );
+
 
       loader.addToLoadBar();
 
       var sm = [
 
+        ["download_1.png" , "System_Preferences.zip"],
         ["twitter_1.png" , "http://twitter.com/share?text=Check%20out%20interactive%20EP%20'System%20Preferences'%20by%20@rioux__;%20visualized%20by%20@cabbibo%20&url=http://cabbibo.com/rioux"],
         ["facebook_1.png" , 'http://www.facebook.com/sharer.php?u=http://cabbibo.com/rioux'],
         ["soundcloud_1.png" , "https://soundcloud.com/rioux"],
         ["cabbibo_1.png" , "http://wom.bs"],
-        ["download_1.png" , "System_Preferences.zip"],
+        ["connect_1.png" , "System_Preferences.zip"],
+        ["rioux_1.png" , "System_Preferences.zip"],
 
 
       ]
