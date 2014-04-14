@@ -92,7 +92,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      audioController.mute.gain.value = .0;
+     // audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -157,7 +157,7 @@
             if ( child instanceof THREE.Mesh ) {
               var geo = new THREE.Geometry();
               var mesh = new THREE.Mesh( child.geometry , mainMaterial );
-              mesh.scale.multiplyScalar( 20 );
+              mesh.scale.multiplyScalar( 30 );
               THREE.GeometryUtils.merge( geo , mesh );
               geo.computeVertexNormals();
               logoGeo = geo;       
@@ -174,7 +174,7 @@
         var w = window.innerWidth;
         var h = window.innerHeight;
 
-        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 15000 );
+        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 30000 );
         camera.position.z = 6000;
 
        

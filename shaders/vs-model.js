@@ -1,4 +1,5 @@
 uniform sampler2D t_audio;
+uniform float power;
 uniform vec3 color;
 
 varying vec4 vAudio;

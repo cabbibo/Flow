@@ -364,6 +364,7 @@ vec4 sphereDisrupt( vec3 center , float r , vec3 p , vec3 v ){
 
 }
 
+
 void main(){
 
   vec3 oPos   = c( t_oPos ); 
@@ -398,6 +399,7 @@ void main(){
 
   }
 
+
   vec3 curl = curlNoise( pos * curlSize );
   //pos -= normalize( pos ) * sAdd.w;
 
@@ -410,8 +412,16 @@ void main(){
   vec4 audio = texture2D( t_audio , vec2( vUv.x , 0.0 ) );
 
   vec3 a3 = audio.xyz * audio.xyz * audio.xyz;
+
+  
+  /*float audioAngle = length( audio.xyz ) * 20.;
+
+  float x = cos( audioAngle );
+  float y = sin( audioAngle );
+  vec3 aDir = vec3( x , y , 0. );*/
+
   //vec3 a3 = audio.xyz;
-  vec3 p = pos + velPower * vel +  ( curlPower * curl ) + ( audioPower * a3 );
+  vec3 p = pos + velPower * vel  * a3 +  ( curlPower * curl );// + ( audioPower * a3 );
   //vec3 p = pos + vel * ( s* .5 + .5);
 
 

@@ -11,7 +11,8 @@ void main(){
 
   vec4 c = texture2D( t_audio , vec2( abs(vDisplacement) , 0.0 ) );
 
-  vec3 cFinal = normalize(color + 10.*c.xyx ) + vec3( power / 3. );
+  vec4 cInverse = vec4( 1.0 ) - c;
+  vec3 cFinal = normalize(color + c.xyx ) + cInverse.xyz * vec3( power / 3. );
 
 
   float fDis = ( vDisplacement ) / displacementPower;
