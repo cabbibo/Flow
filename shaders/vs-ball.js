@@ -4,7 +4,8 @@ uniform float timer;
 uniform float noiseSize;
 uniform float noiseSpeed;
 uniform float noisePower;
-
+uniform float randomizer;
+uniform sampler2D t_audio;
 varying vec2 vUv;
 varying vec3 vPos;
 
@@ -188,9 +189,14 @@ void main() {
   vUv = normalize( position.xy );
 
 
+  float r = randomizer * .7 + .3;
 
-  vec3 offset = vec3( timer ) * noiseSpeed * .9; 
-  vDisplacement = snoise( (position + offset) * noiseSize );
+  vec3 offset = vec3( timer ) * noiseSpeed * .9 * r;
+  float s1 = snoise( (position + offset) * noiseSize * .4 );
+  float s2 = snoise( (position + offset* .9) * noiseSize * 1.4 );
+  //float s3 = snoise( (position + offset* .5) * noiseSize * 2.4 );
+
+  vDisplacement = s1+s2 / 2.0;
 
   vec3 pos = ((vDisplacement * vPos) * noisePower) + position;
   gl_Position = projectionMatrix * modelViewMatrix * vec4( pos, 1.0 );
