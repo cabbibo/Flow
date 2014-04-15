@@ -92,7 +92,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-     // audioController.mute.gain.value = .0;
+      audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -177,12 +177,15 @@
         camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 30000 );
         camera.position.z = 6000;
 
-       
-        controls = new THREE.TrackballControls( camera );
+
+        controls = new THREE.MouseMoveControls( camera );
+        controls.z = 5000;
+        //controls.speed=1;
+        /*controls = new THREE.TrackballControls( camera );
         controls.rotateSpeed = 1;
         controls.minDistance = 1000;
         controls.maxDistance = 10000;
-        controls.dynamicDampingFactor = .1;
+        controls.dynamicDampingFactor = .1;*/
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer();
@@ -225,7 +228,7 @@
         flow.toTexure = SONGS[0].toTexture;
         flow.reset( SONGS[0].fromTexture );
 
-        flow.addBalls();
+        //flow.addBalls();
         //flow.
         scene.add( flow.particles );
 
@@ -294,6 +297,11 @@
         this.social = document.createElement('div');
         this.social.id = 'social';
         document.body.appendChild( this.social );
+
+        this.titleEP  = document.createElement('div');
+        this.titleEP.id = 'titleEP';
+        this.titleEP.innerHTML = 'Rioux - System Preferences';
+        this.social.appendChild( this.titleEP  );
 
         for( var i  = 0; i < smArray.length; i ++ ){
 

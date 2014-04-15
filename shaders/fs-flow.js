@@ -392,12 +392,12 @@ void main(){
   //vec3 vel = (v + dif / 1000.0 + a/2.0) * .8;
   //vec4 p = 2.0 * pos - oPos + a;
 
-  for( int i=0; i< 9; i++ ){
+  /*for( int i=0; i< 9; i++ ){
 
     vec4 sAdd = sphereDisrupt( balls[i] , 400.0 , pos , vel );
     vel += sAdd.xyz;
 
-  }
+  }*/
 
 
   vec3 curl = curlNoise( pos * curlSize );
