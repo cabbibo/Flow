@@ -188,16 +188,17 @@
 
         camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 30000 );
         camera.position.z = 6000;
+        camera.position.x = -6000;
 
 
         controls = new THREE.MouseMoveControls( camera );
         controls.z = 5000;
         //controls.speed=1;
-        /*controls = new THREE.TrackballControls( camera );
+        controls = new THREE.TrackballControls( camera );
         controls.rotateSpeed = 1;
         controls.minDistance = 1000;
         controls.maxDistance = 10000;
-        controls.dynamicDampingFactor = .1;*/
+        controls.dynamicDampingFactor = .1;
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer();

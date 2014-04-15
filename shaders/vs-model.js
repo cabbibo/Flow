@@ -7,7 +7,7 @@ varying vec3 vColor;
 void main() {
 
   vec3 nPos = abs(normalize( position ));
-  vColor = nPos;
+  vColor = abs(position/500.);
 
   vec4 x = texture2D( t_audio , vec2( vColor.x , 0.0) );
   vec4 y = texture2D( t_audio , vec2( vColor.y , 0.0) );
@@ -19,7 +19,7 @@ void main() {
   //vAudio = normalize( x + y + z );
 
 
-  vec4 mvPos = modelViewMatrix * vec4( pos , 1.0 );
+  vec4 mvPos = modelViewMatrix * vec4( position , 1.0 );
 
   gl_Position = projectionMatrix * mvPos;
 }

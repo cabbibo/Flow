@@ -16,7 +16,7 @@ uniform float curlPower;
 uniform float audioPower;
 uniform float resetRadius;
 
-uniform vec3 balls[4];
+uniform vec3 balls[6];
 
 varying vec2 vUv;
 
@@ -392,7 +392,7 @@ void main(){
   //vec3 vel = (v + dif / 1000.0 + a/2.0) * .8;
   //vec4 p = 2.0 * pos - oPos + a;
 
-  for( int i=0; i< 4; i++ ){
+  for( int i=0; i< 6; i++ ){
 
     vec4 sAdd = sphereDisrupt( balls[i] , 600.0 , pos , vel );
     vel += sAdd.xyz;
