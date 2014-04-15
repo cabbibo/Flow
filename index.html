@@ -92,7 +92,7 @@
       var loader = new Loader();
 
       var audioController = new AudioController();
-      audioController.mute.gain.value = .0;
+      //audioController.mute.gain.value = .0;
 
      
       var vertexShaders       = $('script[type="x-shader/x-vertex"]');
@@ -298,7 +298,9 @@
         this.social.id = 'social';
         document.body.appendChild( this.social );
 
-        this.titleEP  = document.createElement('div');
+        this.titleEP  = document.createElement('a');
+        this.titleEP.href = 'https://soundcloud.com/rioux/sets/system-preferences/';
+        this.titleEP.target = '_blank';
         this.titleEP.id = 'titleEP';
         this.titleEP.innerHTML = 'Rioux - System Preferences';
         this.social.appendChild( this.titleEP  );
