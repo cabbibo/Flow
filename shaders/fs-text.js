@@ -17,6 +17,8 @@ void main() {
   vec3 totalColor =tc.xyz*c.xyz;
   gl_FragColor = normalize(vec4( totalColor + aC , c.w )) * power ;
 
+  gl_FragColor  = tc *c * (power/3.) + vec4( vColor*c.xyz* .1 , c.w);
+
 }
 
 

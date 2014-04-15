@@ -16,7 +16,8 @@ void main(){
 
 
   float fDis = ( vDisplacement ) / displacementPower;
-  gl_FragColor = vec4( cFinal + fDis , ((power / 3.) * .5 ) +.5 );
+  float aP = power / 4.;
+  gl_FragColor = vec4( (cFinal + fDis) * aP , (aP*aP * .8 ) +.2 );
 
 }
 
