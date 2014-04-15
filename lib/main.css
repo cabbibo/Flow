@@ -208,6 +208,13 @@ a:hover{
   opacity:1;
 }*/
 
+#titleEP{
+  position: absolute;
+  right: 5px;
+  font-size: 23px;
+  bottom: 35px;
+  opacity: .6;
+}
 
 #GUI{
 
