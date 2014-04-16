@@ -131,13 +131,14 @@
 
       var sm = [
 
-        ["download_1.png" , "System_Preferences.zip"],
-        ["twitter_1.png" , "http://twitter.com/share?text=Check%20out%20interactive%20EP%20'System%20Preferences'%20by%20@rioux__;%20visualized%20by%20@cabbibo%20&url=http://cabbibo.com/rioux"],
-        ["facebook_1.png" , 'http://www.facebook.com/sharer.php?u=http://cabbibo.com/rioux'],
-        ["soundcloud_1.png" , "https://soundcloud.com/rioux"],
-        ["cabbibo_1.png" , "http://wom.bs"],
-        ["connect_1.png" , "http://co-nnect.me/"],
-        ["rioux_1.png" , "http://rioux.fm/"],
+        ["Download" , "download_1.png" , "System_Preferences.zip"],
+        ["Share on Twitter" ,"twitter_1.png" , "http://twitter.com/share?text=Check%20out%20interactive%20EP%20'System%20Preferences'%20by%20@rioux__;%20visualized%20by%20@cabbibo%20&url=http://cabbibo.com/rioux"],
+        ["Share on Facebook", "facebook_1.png" , 'http://www.facebook.com/sharer.php?u=http://cabbibo.com/rioux'],
+        ["Rioux on Soundcloud" ,"soundcloud_1.png" , "https://soundcloud.com/rioux"],
+        ["Wom.bs" , "cabbibo_1.png" , "http://wom.bs"],
+        ["Co-nnect.me" , "connect_1.png" , "http://co-nnect.me/"],
+        ["Rioux.fm" , "rioux_1.png" , "http://rioux.fm/"],
+       // ["Information" , 
 
 
       ]
@@ -311,28 +312,52 @@
         this.social.id = 'social';
         document.body.appendChild( this.social );
 
-        this.titleEP  = document.createElement('a');
-        this.titleEP.href = 'https://soundcloud.com/rioux/sets/system-preferences/';
-        this.titleEP.target = '_blank';
-        this.titleEP.id = 'titleEP';
-        this.titleEP.innerHTML = 'Rioux - System Preferences';
-        this.social.appendChild( this.titleEP  );
+        window.titleEP  = document.createElement('a');
+        window.titleEP.href = 'https://soundcloud.com/rioux/sets/system-preferences/';
+        window.titleEP.target = '_blank';
+        window.titleEP.id = 'titleEP';
+        window.titleEP.innerHTML = 'Rioux - System Preferences';
+
+
+        this.social.appendChild( window.titleEP  );
 
         for( var i  = 0; i < smArray.length; i ++ ){
 
           var a = document.createElement('a');
-          a.href = smArray[i][1];
+          a.href = smArray[i][2];
           a.target = '_blank';
 
-          a.style.background = 'url( icons/'+smArray[i][0]+')';
+
+          a.style.background = 'url( icons/'+smArray[i][1]+')';
           a.style.backgroundSize = '100%';
           a.className += 'social';
+          a.INFO_TEXT = smArray[i][0];
 
           this.social.appendChild( a );
 
         }
 
       }
+
+      $('.social').hover( function( e ){
+
+        //console.log( e );
+
+        if( e.type == 'mouseenter' ){
+
+
+
+          titleEP.innerHTML = e.toElement.INFO_TEXT;
+
+        }else{
+
+          titleEP.innerHTML = 'Rioux - System Preferences';
+          
+
+        }
+
+
+      });
     </script>
 
   </body>
