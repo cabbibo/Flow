@@ -117,8 +117,25 @@ a:hover{
   text-align    : center;
   //background    : #fff;
 
+}
 
+#informationSection{
 
+display:none;
+
+  padding:5px;
+  position:absolute;
+  z-index:500px;
+  right:0px;
+  bottom:50px;
+  color:#fff;
+  background: #000;
+  //border: 1px solid white;
+
+}
+
+#informationSection h1{
+  font-size:20px;
 }
 #renderingContainer{
 
@@ -243,3 +260,33 @@ a:hover{
 
 }
 
+#startInfo{
+
+  width:300px;
+  height:300px;
+  color:#fff;
+  position:absolute;
+  left:50%;
+  top:50%;
+  margin-left:-150px;
+  margin-top:10px;
+  text-align:center;
+  display:none;
+
+}
+
+#startButton{
+
+  color:#fff;
+  position:absolute;
+  top:-80px;
+  height:80px;
+  background:#000;
+  width:100%;
+  margin-left:-150px;
+  font-size:75px;
+
+}
+#startButton:hover{
+//background:#f00;
+}

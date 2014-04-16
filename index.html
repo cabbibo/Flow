@@ -4,8 +4,27 @@
 
   Again, This is another project with a really crappy code base
   because of tight time constraints. I would suggest avoiding it
-  at all costs
+  at all costs. 
+
+  That being said, there are a few cool files that are usuable
+  to one degree or another. Specifcally the GPGPU ( by @mrdoob )
+  and the TextCreator.js , and AudioTexture.js seem pretty fun.
+
+
+  Thanks to:
+  @Rioux__
+  @mrdoob
+  @RezaAli / @EddieTree for the Curl Noise
+  @BlurSpine for general graphics inspiration
+  @thespite for general graphics inspiration
+
+  and YOU! for reading this source :)
+
+  Let me know if you have any question / comments 
+  ( Aside from saying the code is ugly. I already know it is. )
   
+  
+  @Cabbibo
 
 
 -->
@@ -18,6 +37,31 @@
 
   <body>
 
+    <div id="informationSection" >
+
+      <h1><a href="System_Preferences.zip" target="_blank" > Rioux - System Preferences </a></h1>
+      <h1><a href="http://twitter.com/cabbibo" target="_blank" >Visualized by Cabbibo</a></h1>
+
+      <h1> Instructions </h1>
+      <p> 
+        Drag to Rotate , Scroll to Zoom <br/>
+        Click Heads to change songs </br>
+        Click and Drag Spheres to disrupt particles<br/>
+      </p>
+
+
+      <h1> About </h1>
+
+      <p> 
+        Written using <a href="http://threejs.org" targt="_blank">three.js</a><br/>
+        as well as <a href="https://github.com/mrdoob/sporel" target="_blank">GPGPU.js from Sproel</a><br/>
+        Lee Perry Smith head model by <a href="http://ir-ltd.net/" target="_blank">Infinite-Realities</a><br/>
+
+      <br/>
+
+
+
+    </div>
 
     <script src="lib/three.js"></script>
     <script src="lib/jquery.min.js"></script>
@@ -138,7 +182,7 @@
         ["Wom.bs" , "cabbibo_1.png" , "http://wom.bs"],
         ["Co-nnect.me" , "connect_1.png" , "http://co-nnect.me/"],
         ["Rioux.fm" , "rioux_1.png" , "http://rioux.fm/"],
-       // ["Information" , 
+        ["Information" , "info_1.png" , "" ],
 
 
       ]
@@ -200,6 +244,7 @@
         controls.minDistance = 1000;
         controls.maxDistance = 10000;
         controls.dynamicDampingFactor = .1;
+        controls.noPan = true;
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer();
@@ -207,7 +252,7 @@
 
         stats = new Stats();
         stats.domElement.id = "stats";
-        document.body.appendChild( stats.domElement );
+        //document.body.appendChild( stats.domElement );
 
         size = 512;
 
@@ -251,9 +296,9 @@
         window.addEventListener( 'resize', onResize , false );
         
 
-        SONGS[0].begin();
-        loader.liftCurtain();
-        animate();
+        //SONGS[0].begin();
+        //loader.liftCurtain();
+        //animate();
 
       }
 
@@ -324,8 +369,15 @@
         for( var i  = 0; i < smArray.length; i ++ ){
 
           var a = document.createElement('a');
-          a.href = smArray[i][2];
-          a.target = '_blank';
+
+          if( i != smArray.length -1 ){
+            a.href = smArray[i][2];
+            a.target = '_blank';
+          }else{
+            a.onClick = "function(){ console.log('hello')}";
+            a.id = "information"
+          }
+
 
 
           a.style.background = 'url( icons/'+smArray[i][1]+')';
@@ -356,6 +408,21 @@
 
         }
 
+
+      });
+
+      $("#information").click( function(){
+
+          $("#informationSection").toggle();
+
+      });
+
+      $("#startInfo").click( function(){
+
+        SONGS[0].begin();
+        loader.liftCurtain();
+
+        animate();
 
       });
     </script>
