@@ -376,7 +376,8 @@
 
           if( i != smArray.length -1 ){
             a.href = smArray[i][2];
-            a.target = '_blank';
+            if( i != 0 )
+              a.target = '_blank';
           }else{
             a.onClick = "function(){ console.log('hello')}";
             a.id = "information"
